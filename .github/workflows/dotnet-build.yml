@@ -1,0 +1,54 @@
+name: .NET Core Desktop
+
+on:
+  push:
+    branches: [ "main" ]
+    tags-ignore: [ "**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore packages
+      run: dotnet restore
+
+    # Get current date for release naming
+    - name: Get current date
+      id: date
+      run: echo "DATE=$(date +'%y.%m.%d')" >> $ENV:GITHUB_OUTPUT
+
+    # Build applications
+    - name: Build SysBot.Base
+      run: dotnet build -c Release
+
+    # Publish package
+    - name: Publish SysBot.Base package
+      if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      run: |
+        dotnet pack -c Release --include-symbols -p:Version=${{ steps.date.outputs.DATE }}.${{ github.run_number }} -o ./
+        dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s $NUGET_HOST SysBot.Base.${{ steps.date.outputs.DATE }}.${{ github.run_number }}.nupkg
+
+    # Create release
+    - name: Release 
+      uses: softprops/action-gh-release@v1
+      if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      with:
+        tag_name: ${{ steps.date.outputs.DATE }}.${{ github.run_number }}
+        prerelease: false
+        body: Release, compare Git commits.

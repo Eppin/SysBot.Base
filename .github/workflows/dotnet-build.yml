@@ -41,7 +41,7 @@ jobs:
     - name: Publish SysBot.Base package
       if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
       run: |
-        dotnet pack -c Release --include-symbols -p:Version=${{ steps.date.outputs.DATE }}.${{ github.run_number }} -o ./
+        dotnet pack -c Release --include-symbols -p:Version=${{ steps.date.outputs.DATE }}.${{ github.run_number }} -o ./../
         dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json SysBot.Base.${{ steps.date.outputs.DATE }}.${{ github.run_number }}.nupkg
 
     # Create release

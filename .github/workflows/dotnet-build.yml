@@ -29,9 +29,9 @@ jobs:
       run: dotnet restore
 
     # Get current date for release naming
-    - name: Get current date
-      id: date
-      run: echo "DATE=$(date +'%y.%m.%d')" >> $ENV:GITHUB_OUTPUT
+    #- name: Get current date
+    #  id: date
+    #  run: echo "DATE=$(date +'%y.%m.%d')" >> $ENV:GITHUB_OUTPUT
 
     # Build applications
     - name: Build SysBot.Base
@@ -41,14 +41,14 @@ jobs:
     - name: Publish SysBot.Base package
       if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
       run: |
-        dotnet pack -c Release --include-symbols -p:Version=${{ steps.date.outputs.DATE }}.${{ github.run_number }} -o ./../
-        dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json ./SysBot.Base/SysBot.Base.${{ steps.date.outputs.DATE }}.${{ github.run_number }}.nupkg
+        dotnet pack -c Release --include-symbols -p:Version=1.0.${{ github.run_number }} -o ./
+        dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json SysBot.Base.1.0.${{ github.run_number }}.nupkg
 
     # Create release
     - name: Release 
       uses: softprops/action-gh-release@v1
       if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
       with:
-        tag_name: ${{ steps.date.outputs.DATE }}.${{ github.run_number }}
+        tag_name: 1.0.${{ github.run_number }}
         prerelease: false
         body: Release, compare Git commits.

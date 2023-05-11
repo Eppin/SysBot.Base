@@ -9,7 +9,7 @@ namespace SysBot.Base
         string LastLogged { get; }
         DateTime LastTime { get; }
         void ReportStatus();
-        void Log(string message, bool logAlways = true);
+        void Log(string message);
         string GetSummary();
 
         /// <summary>

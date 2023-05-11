@@ -25,9 +25,9 @@ namespace SysBot.Base
 
         public abstract string GetSummary();
 
-        public void Log(string message, bool logAlways = true)
+        public void Log(string message)
         {
-            Connection.Log(message, logAlways);
+            Connection.Log(message);
             LastLogged = message;
             LastTime = DateTime.Now;
         }
